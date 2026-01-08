@@ -1,0 +1,11 @@
+# Version archives
+.versions/
+
+# System files
+.DS_Store
+*.swp
+*.swo
+
+# Claude configuration
+.claude/
+.github-commit-messages
