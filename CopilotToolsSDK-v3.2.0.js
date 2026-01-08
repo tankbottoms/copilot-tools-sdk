@@ -1,16 +1,22 @@
 /**
- * COPILOT TOOLS v3.2.0
+ * COPILOT TOOLS SDK v3.2.0
  * Comprehensive Transaction Management SDK for Copilot.money
- * 
- * NEW IN v3.2.0:
- * - Restored createTransaction with duplicate detection
- * - Restored batchCreateTransactions with progress callbacks
- * - CSV import with parseCSV and importFromCSV
- * - Improved duplicate analysis tools
- * 
+ * Tested with: https://app.copilot.money v26.1.8-beta.1214 (Build: 630)
+ *
+ * FEATURES:
+ * - Transaction CRUD with duplicate detection
+ * - Batch import with progress callbacks
+ * - CSV import (parseCSV, importFromCSV, analyzeCSVForDuplicates)
+ * - Category Management (create, update, delete, merge, hierarchy)
+ * - Budget Management (get, set, status)
+ * - Recurring Management (create, update, delete, link transactions)
+ * - Analytics (spending trends, merchant analysis, anomalies, comparisons)
+ * - Account Management (summaries, hidden accounts)
+ * - Tag Management (create, update, delete)
+ *
  * CSV FORMAT SUPPORTED:
- * "date","name","amount","status","category","parent category","excluded","tags","type","account","account mask","note","recurring"
- * 
+ * date,name,amount,status,category,parent category,excluded,tags,type,account,account mask,note,recurring
+ *
  * 2026-01-08
  */
 
@@ -63,6 +69,22 @@ CopilotTools.mutations.DELETE_TAG = {kind:'Document',definitions:[{kind:'Operati
 CopilotTools.mutations.EDIT_TAG = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'EditTag'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'id'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'input'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'EditTagInput'}}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'editTag'},arguments:[{kind:'Argument',name:{kind:'Name',value:'id'},value:{kind:'Variable',name:{kind:'Name',value:'id'}}},{kind:'Argument',name:{kind:'Name',value:'input'},value:{kind:'Variable',name:{kind:'Name',value:'input'}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'id'}},{kind:'Field',name:{kind:'Name',value:'name'}},{kind:'Field',name:{kind:'Name',value:'colorName'}}]}}]}}]};
 
 CopilotTools.mutations.DELETE_CATEGORY = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'DeleteCategory'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'id'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'deleteCategory'},arguments:[{kind:'Argument',name:{kind:'Name',value:'id'},value:{kind:'Variable',name:{kind:'Name',value:'id'}}}]}]}}]};
+
+CopilotTools.mutations.CREATE_CATEGORY = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'CreateCategory'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'input'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'CreateCategoryInput'}}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'createCategory'},arguments:[{kind:'Argument',name:{kind:'Name',value:'input'},value:{kind:'Variable',name:{kind:'Name',value:'input'}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'id'}},{kind:'Field',name:{kind:'Name',value:'name'}},{kind:'Field',name:{kind:'Name',value:'colorName'}}]}}]}}]};
+
+CopilotTools.mutations.EDIT_CATEGORY = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'EditCategory'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'id'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'input'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'EditCategoryInput'}}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'budget'}},type:{kind:'NamedType',name:{kind:'Name',value:'Boolean'}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'spend'}},type:{kind:'NamedType',name:{kind:'Name',value:'Boolean'}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'editCategory'},arguments:[{kind:'Argument',name:{kind:'Name',value:'id'},value:{kind:'Variable',name:{kind:'Name',value:'id'}}},{kind:'Argument',name:{kind:'Name',value:'input'},value:{kind:'Variable',name:{kind:'Name',value:'input'}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'id'}},{kind:'Field',name:{kind:'Name',value:'name'}},{kind:'Field',name:{kind:'Name',value:'colorName'}},{kind:'Field',name:{kind:'Name',value:'parentCategoryId'}}]}}]}}]};
+
+CopilotTools.mutations.EDIT_BUDGET = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'EditBudget'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'categoryId'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'input'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'EditBudgetInput'}}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'editBudget'},arguments:[{kind:'Argument',name:{kind:'Name',value:'categoryId'},value:{kind:'Variable',name:{kind:'Name',value:'categoryId'}}},{kind:'Argument',name:{kind:'Name',value:'input'},value:{kind:'Variable',name:{kind:'Name',value:'input'}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'amount'}}]}}]}}]};
+
+CopilotTools.mutations.CREATE_RECURRING = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'CreateRecurring'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'input'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'CreateRecurringInput'}}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'createRecurring'},arguments:[{kind:'Argument',name:{kind:'Name',value:'input'},value:{kind:'Variable',name:{kind:'Name',value:'input'}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'id'}},{kind:'Field',name:{kind:'Name',value:'name'}},{kind:'Field',name:{kind:'Name',value:'frequency'}}]}}]}}]};
+
+CopilotTools.mutations.EDIT_RECURRING = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'EditRecurring'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'id'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'input'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'EditRecurringInput'}}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'editRecurring'},arguments:[{kind:'Argument',name:{kind:'Name',value:'id'},value:{kind:'Variable',name:{kind:'Name',value:'id'}}},{kind:'Argument',name:{kind:'Name',value:'input'},value:{kind:'Variable',name:{kind:'Name',value:'input'}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'id'}},{kind:'Field',name:{kind:'Name',value:'name'}},{kind:'Field',name:{kind:'Name',value:'frequency'}}]}}]}}]};
+
+CopilotTools.mutations.DELETE_RECURRING = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'DeleteRecurring'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'id'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'deleteRecurring'},arguments:[{kind:'Argument',name:{kind:'Name',value:'id'},value:{kind:'Variable',name:{kind:'Name',value:'id'}}}]}]}}]};
+
+CopilotTools.mutations.ADD_TO_RECURRING = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'AddTransactionToRecurring'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'itemId'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'accountId'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'id'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'input'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'AddTransactionToRecurringInput'}}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'addTransactionToRecurring'},arguments:[{kind:'Argument',name:{kind:'Name',value:'itemId'},value:{kind:'Variable',name:{kind:'Name',value:'itemId'}}},{kind:'Argument',name:{kind:'Name',value:'accountId'},value:{kind:'Variable',name:{kind:'Name',value:'accountId'}}},{kind:'Argument',name:{kind:'Name',value:'id'},value:{kind:'Variable',name:{kind:'Name',value:'id'}}},{kind:'Argument',name:{kind:'Name',value:'input'},value:{kind:'Variable',name:{kind:'Name',value:'input'}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'transaction'},selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'id'}},{kind:'Field',name:{kind:'Name',value:'recurringId'}}]}}]}}]}}]};
+
+CopilotTools.mutations.EDIT_TAG = {kind:'Document',definitions:[{kind:'OperationDefinition',operation:'mutation',name:{kind:'Name',value:'EditTag'},variableDefinitions:[{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'id'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'ID'}}}},{kind:'VariableDefinition',variable:{kind:'Variable',name:{kind:'Name',value:'input'}},type:{kind:'NonNullType',type:{kind:'NamedType',name:{kind:'Name',value:'EditTagInput'}}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'editTag'},arguments:[{kind:'Argument',name:{kind:'Name',value:'id'},value:{kind:'Variable',name:{kind:'Name',value:'id'}}},{kind:'Argument',name:{kind:'Name',value:'input'},value:{kind:'Variable',name:{kind:'Name',value:'input'}}}],selectionSet:{kind:'SelectionSet',selections:[{kind:'Field',name:{kind:'Name',value:'id'}},{kind:'Field',name:{kind:'Name',value:'name'}},{kind:'Field',name:{kind:'Name',value:'colorName'}}]}}]}}]};
 
 // === CACHE LOOKUP FUNCTIONS ===
 
@@ -607,6 +629,398 @@ CopilotTools.deleteTag = function(tagName) {
   }).then(function() { return {success:true}; }).catch(function(e) { return {success:false,error:e.message}; });
 };
 
+CopilotTools.updateTag = function(tagName, updates) {
+  var lookups = CopilotTools.buildLookups();
+  var tag = lookups.tags[tagName];
+  if (!tag) return Promise.resolve({success:false,error:"Tag not found: " + tagName});
+  var input = {};
+  if (updates.name) input.name = updates.name;
+  if (updates.colorName) input.colorName = updates.colorName;
+  return CopilotTools._withRetry(function() {
+    return window.__APOLLO_CLIENT__.mutate({mutation:CopilotTools.mutations.EDIT_TAG,variables:{id:tag.id,input:input}});
+  }).then(function(result) {
+    CopilotTools.log("Updated tag: " + tagName);
+    return {success:true,data:result.data.editTag};
+  }).catch(function(e) { return {success:false,error:e.message}; });
+};
+
+// === CATEGORY MANAGEMENT ===
+
+CopilotTools.createCategory = function(name, options) {
+  options = options || {};
+  if (!name) return Promise.resolve({success:false,error:"Category name required"});
+  var lookups = CopilotTools.buildLookups();
+  if (lookups.categories[name]) return Promise.resolve({success:false,error:"Category exists: " + name});
+  var parentId = null;
+  if (options.parentCategory) {
+    var parent = lookups.categories[options.parentCategory];
+    if (!parent) return Promise.resolve({success:false,error:"Parent not found: " + options.parentCategory});
+    parentId = parent.id;
+  }
+  return CopilotTools._withRetry(function() {
+    return window.__APOLLO_CLIENT__.mutate({
+      mutation: CopilotTools.mutations.CREATE_CATEGORY,
+      variables: {input:{name:name,colorName:options.colorName||"BLUE1",parentCategoryId:parentId,isExcluded:options.isExcluded||false}}
+    });
+  }).then(function(result) {
+    CopilotTools.log("Created category: " + name);
+    return {success:true,data:result.data.createCategory};
+  }).catch(function(error) {
+    CopilotTools.error("Create category failed: " + error.message);
+    return {success:false,error:error.message};
+  });
+};
+
+CopilotTools.updateCategory = function(categoryName, updates) {
+  var lookups = CopilotTools.buildLookups();
+  var cat = lookups.categories[categoryName];
+  if (!cat) return Promise.resolve({success:false,error:"Category not found: " + categoryName});
+  var input = {};
+  if (updates.name) input.name = updates.name;
+  if (updates.colorName) input.colorName = updates.colorName;
+  if (updates.parentCategory !== undefined) {
+    if (!updates.parentCategory) input.parentCategoryId = null;
+    else {
+      var parent = lookups.categories[updates.parentCategory];
+      if (!parent) return Promise.resolve({success:false,error:"Parent not found: " + updates.parentCategory});
+      input.parentCategoryId = parent.id;
+    }
+  }
+  return CopilotTools._withRetry(function() {
+    return window.__APOLLO_CLIENT__.mutate({
+      mutation: CopilotTools.mutations.EDIT_CATEGORY,
+      variables: {id:cat.id,input:input,budget:true,spend:true}
+    });
+  }).then(function(result) {
+    CopilotTools.log("Updated category: " + categoryName);
+    return {success:true,data:result.data.editCategory};
+  }).catch(function(error) { return {success:false,error:error.message}; });
+};
+
+CopilotTools.deleteCategory = function(categoryName) {
+  var lookups = CopilotTools.buildLookups();
+  var cat = lookups.categories[categoryName];
+  if (!cat) return Promise.resolve({success:false,error:"Category not found: " + categoryName});
+  if (cat.canBeDeleted === false) return Promise.resolve({success:false,error:"Cannot delete: " + categoryName});
+  return CopilotTools._withRetry(function() {
+    return window.__APOLLO_CLIENT__.mutate({mutation:CopilotTools.mutations.DELETE_CATEGORY,variables:{id:cat.id}});
+  }).then(function() {
+    CopilotTools.log("Deleted category: " + categoryName);
+    return {success:true};
+  }).catch(function(error) { return {success:false,error:error.message}; });
+};
+
+CopilotTools.listCategoryHierarchy = function() {
+  var lookups = CopilotTools.buildLookups();
+  var hierarchy = {};
+  for (var name in lookups.categories) {
+    var cat = lookups.categories[name];
+    if (!cat.parentCategoryId) hierarchy[name] = {category:cat,children:[]};
+  }
+  for (var name2 in lookups.categories) {
+    var cat2 = lookups.categories[name2];
+    if (cat2.parentCategoryId) {
+      var parentName = null;
+      for (var pn in lookups.categories) {
+        if (lookups.categories[pn].id === cat2.parentCategoryId) { parentName = pn; break; }
+      }
+      if (parentName && hierarchy[parentName]) hierarchy[parentName].children.push(name2);
+    }
+  }
+  return hierarchy;
+};
+
+CopilotTools.mergeCategories = function(sourceNames, targetName, options) {
+  options = options || {};
+  var lookups = CopilotTools.buildLookups();
+  var target = lookups.categories[targetName];
+  if (!target) return Promise.resolve({success:false,error:"Target category not found: " + targetName});
+  var txs = CopilotTools.getCachedTransactions();
+  var toUpdate = [];
+  sourceNames.forEach(function(srcName) {
+    var src = lookups.categories[srcName];
+    if (src) txs.forEach(function(tx) { if (tx.categoryId === src.id) toUpdate.push(tx); });
+  });
+  CopilotTools.log("Found " + toUpdate.length + " transactions to merge into " + targetName);
+  if (options.dryRun) return Promise.resolve({success:true,dryRun:true,count:toUpdate.length});
+  var results = {updated:0,errors:[]};
+  var updateNext = function(i) {
+    if (i >= toUpdate.length) return Promise.resolve({success:true,results:results});
+    return CopilotTools.updateTransaction(toUpdate[i].id, {categoryName:targetName}).then(function(r) {
+      if (r.success) results.updated++; else results.errors.push(toUpdate[i].id);
+      return CopilotTools._delay();
+    }).then(function() { return updateNext(i+1); });
+  };
+  return updateNext(0);
+};
+
+// === BUDGET MANAGEMENT ===
+
+CopilotTools.getBudgets = function() {
+  var cache = window.__APOLLO_CLIENT__.cache.extract();
+  var lookups = CopilotTools.buildLookups();
+  var budgets = {};
+  for (var key in cache) {
+    if (key.indexOf("CategoryMonthlyBudget:") === 0) {
+      var b = cache[key];
+      if (!budgets[b.month]) budgets[b.month] = {};
+      var catName = null;
+      for (var cn in lookups.categories) {
+        if (b.id && b.id.indexOf(lookups.categories[cn].id) >= 0) { catName = cn; break; }
+      }
+      if (catName) budgets[b.month][catName] = {amount:b.amount,spent:b.spent||0,remaining:b.amount-(b.spent||0)};
+    }
+  }
+  return budgets;
+};
+
+CopilotTools.setBudget = function(categoryName, amount) {
+  var lookups = CopilotTools.buildLookups();
+  var cat = lookups.categories[categoryName];
+  if (!cat) return Promise.resolve({success:false,error:"Category not found: " + categoryName});
+  return CopilotTools._withRetry(function() {
+    return window.__APOLLO_CLIENT__.mutate({mutation:CopilotTools.mutations.EDIT_BUDGET,variables:{categoryId:cat.id,input:{amount:parseFloat(amount)}}});
+  }).then(function(result) {
+    CopilotTools.log("Set budget for " + categoryName + ": $" + amount);
+    return {success:true,data:result.data};
+  }).catch(function(error) { return {success:false,error:error.message}; });
+};
+
+CopilotTools.getBudgetStatus = function(month) {
+  month = month || new Date().toISOString().slice(0,7);
+  var budgets = CopilotTools.getBudgets();
+  var status = budgets[month] || {};
+  var txs = CopilotTools.getCachedTransactions();
+  var lookups = CopilotTools.buildLookups();
+  var spending = {};
+  txs.forEach(function(tx) {
+    if (tx.date && tx.date.slice(0,7) === month && tx.type !== "INCOME") {
+      var catName = null;
+      for (var cn in lookups.categories) {
+        if (lookups.categories[cn].id === tx.categoryId) { catName = cn; break; }
+      }
+      if (catName) {
+        if (!spending[catName]) spending[catName] = 0;
+        spending[catName] += Math.abs(tx.amount);
+      }
+    }
+  });
+  var result = [];
+  for (var cat in status) {
+    result.push({category:cat,budget:status[cat].amount,spent:spending[cat]||0,remaining:status[cat].amount-(spending[cat]||0),percentUsed:Math.round((spending[cat]||0)/status[cat].amount*100)});
+  }
+  return result.sort(function(a,b){return b.percentUsed-a.percentUsed;});
+};
+
+// === RECURRING MANAGEMENT ===
+
+CopilotTools.createRecurring = function(txId, frequency) {
+  var cache = window.__APOLLO_CLIENT__.cache.extract();
+  var tx = null;
+  for (var key in cache) {
+    if (key.indexOf("Transaction:") === 0 && cache[key].id === txId) { tx = cache[key]; break; }
+  }
+  if (!tx) return Promise.resolve({success:false,error:"Transaction not found"});
+  frequency = (frequency || "MONTHLY").toUpperCase();
+  return CopilotTools._withRetry(function() {
+    return window.__APOLLO_CLIENT__.mutate({
+      mutation: CopilotTools.mutations.CREATE_RECURRING,
+      variables: {input:{frequency:frequency,transaction:{transactionId:txId,accountId:tx.accountId,itemId:tx.itemId}}}
+    });
+  }).then(function(result) {
+    CopilotTools.log("Created recurring from: " + txId);
+    return {success:true,data:result.data.createRecurring};
+  }).catch(function(error) { return {success:false,error:error.message}; });
+};
+
+CopilotTools.updateRecurring = function(recurringName, updates) {
+  var lookups = CopilotTools.buildLookups();
+  var rec = lookups.recurrings[recurringName];
+  if (!rec) return Promise.resolve({success:false,error:"Recurring not found: " + recurringName});
+  var input = {};
+  if (updates.name) input.name = updates.name;
+  if (updates.frequency) input.frequency = updates.frequency.toUpperCase();
+  if (updates.categoryName) {
+    var cat = lookups.categories[updates.categoryName];
+    if (cat) input.categoryId = cat.id;
+  }
+  return CopilotTools._withRetry(function() {
+    return window.__APOLLO_CLIENT__.mutate({mutation:CopilotTools.mutations.EDIT_RECURRING,variables:{id:rec.id,input:input}});
+  }).then(function(result) {
+    CopilotTools.log("Updated recurring: " + recurringName);
+    return {success:true,data:result.data.editRecurring};
+  }).catch(function(error) { return {success:false,error:error.message}; });
+};
+
+CopilotTools.deleteRecurring = function(recurringName) {
+  var lookups = CopilotTools.buildLookups();
+  var rec = lookups.recurrings[recurringName];
+  if (!rec) return Promise.resolve({success:false,error:"Recurring not found: " + recurringName});
+  return CopilotTools._withRetry(function() {
+    return window.__APOLLO_CLIENT__.mutate({mutation:CopilotTools.mutations.DELETE_RECURRING,variables:{id:rec.id}});
+  }).then(function() {
+    CopilotTools.log("Deleted recurring: " + recurringName);
+    return {success:true};
+  }).catch(function(error) { return {success:false,error:error.message}; });
+};
+
+CopilotTools.getRecurringTransactions = function(recurringName) {
+  var lookups = CopilotTools.buildLookups();
+  var rec = lookups.recurrings[recurringName];
+  if (!rec) return [];
+  return CopilotTools.getCachedTransactions().filter(function(tx) { return tx.recurringId === rec.id; });
+};
+
+CopilotTools.addTransactionToRecurring = function(txId, recurringName) {
+  var cache = window.__APOLLO_CLIENT__.cache.extract();
+  var tx = null;
+  for (var key in cache) {
+    if (key.indexOf("Transaction:") === 0 && cache[key].id === txId) { tx = cache[key]; break; }
+  }
+  if (!tx) return Promise.resolve({success:false,error:"Transaction not found"});
+  var lookups = CopilotTools.buildLookups();
+  var rec = lookups.recurrings[recurringName];
+  if (!rec) return Promise.resolve({success:false,error:"Recurring not found: " + recurringName});
+  return CopilotTools._withRetry(function() {
+    return window.__APOLLO_CLIENT__.mutate({
+      mutation: CopilotTools.mutations.ADD_TO_RECURRING,
+      variables: {accountId:tx.accountId,itemId:tx.itemId,id:txId,input:{recurringId:rec.id,isExcluded:false}}
+    });
+  }).then(function(result) {
+    CopilotTools.log("Added transaction to recurring: " + recurringName);
+    return {success:true,data:result.data};
+  }).catch(function(error) { return {success:false,error:error.message}; });
+};
+
+// === ANALYTICS ===
+
+CopilotTools.getSpendingTrend = function(categoryName, months) {
+  months = months || 6;
+  var lookups = CopilotTools.buildLookups();
+  var cat = categoryName ? lookups.categories[categoryName] : null;
+  var txs = CopilotTools.getCachedTransactions();
+  var trend = {};
+  var now = new Date();
+  for (var i = 0; i < months; i++) {
+    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    trend[d.toISOString().slice(0,7)] = 0;
+  }
+  txs.forEach(function(tx) {
+    if (!tx.date || tx.type === "INCOME" || tx.type === "INTERNAL_TRANSFER") return;
+    var month = tx.date.slice(0,7);
+    if (trend[month] === undefined) return;
+    if (cat && tx.categoryId !== cat.id) return;
+    trend[month] += Math.abs(tx.amount);
+  });
+  return Object.keys(trend).sort().map(function(m) { return {month:m,amount:Math.round(trend[m]*100)/100}; });
+};
+
+CopilotTools.getMerchantAnalysis = function(limit) {
+  limit = limit || 20;
+  var txs = CopilotTools.getCachedTransactions();
+  var merchants = {};
+  txs.forEach(function(tx) {
+    if (!tx.name || tx.type === "INCOME" || tx.type === "INTERNAL_TRANSFER") return;
+    var name = tx.name.toLowerCase().trim();
+    if (!merchants[name]) merchants[name] = {name:tx.name,count:0,total:0};
+    merchants[name].count++;
+    merchants[name].total += Math.abs(tx.amount);
+  });
+  return Object.values(merchants).sort(function(a,b){return b.total-a.total;}).slice(0,limit).map(function(m){
+    return {name:m.name,count:m.count,total:Math.round(m.total*100)/100,avgTransaction:Math.round(m.total/m.count*100)/100};
+  });
+};
+
+CopilotTools.findAnomalies = function(options) {
+  options = options || {};
+  var stdDevMultiple = options.stdDevMultiple || 2;
+  var merchants = {};
+  var txs = CopilotTools.getCachedTransactions();
+  txs.forEach(function(tx) {
+    if (!tx.name) return;
+    var name = tx.name.toLowerCase().trim();
+    if (!merchants[name]) merchants[name] = [];
+    merchants[name].push(Math.abs(tx.amount));
+  });
+  var anomalies = [];
+  for (var name in merchants) {
+    var amounts = merchants[name];
+    if (amounts.length < 3) continue;
+    var mean = amounts.reduce(function(a,b){return a+b;},0) / amounts.length;
+    var variance = amounts.reduce(function(a,b){return a+(b-mean)*(b-mean);},0) / amounts.length;
+    var stdDev = Math.sqrt(variance);
+    txs.forEach(function(tx) {
+      if (tx.name && tx.name.toLowerCase().trim() === name) {
+        var amt = Math.abs(tx.amount);
+        if (Math.abs(amt - mean) > stdDev * stdDevMultiple) {
+          anomalies.push({id:tx.id,name:tx.name,amount:tx.amount,date:tx.date,expected:Math.round(mean*100)/100,deviation:Math.round((amt-mean)*100)/100});
+        }
+      }
+    });
+  }
+  return anomalies;
+};
+
+CopilotTools.compareMonths = function(month1, month2) {
+  var lookups = CopilotTools.buildLookups();
+  var txs = CopilotTools.getCachedTransactions();
+  var data1 = {total:0,byCategory:{}};
+  var data2 = {total:0,byCategory:{}};
+  txs.forEach(function(tx) {
+    if (!tx.date || tx.type === "INCOME" || tx.type === "INTERNAL_TRANSFER") return;
+    var month = tx.date.slice(0,7);
+    var catName = "Other";
+    for (var cn in lookups.categories) {
+      if (lookups.categories[cn].id === tx.categoryId) { catName = cn; break; }
+    }
+    if (month === month1) {
+      data1.total += Math.abs(tx.amount);
+      if (!data1.byCategory[catName]) data1.byCategory[catName] = 0;
+      data1.byCategory[catName] += Math.abs(tx.amount);
+    } else if (month === month2) {
+      data2.total += Math.abs(tx.amount);
+      if (!data2.byCategory[catName]) data2.byCategory[catName] = 0;
+      data2.byCategory[catName] += Math.abs(tx.amount);
+    }
+  });
+  var comparison = [];
+  var allCats = Object.keys(Object.assign({},data1.byCategory,data2.byCategory));
+  allCats.forEach(function(cat) {
+    var v1 = data1.byCategory[cat] || 0;
+    var v2 = data2.byCategory[cat] || 0;
+    comparison.push({category:cat,month1:Math.round(v1*100)/100,month2:Math.round(v2*100)/100,change:Math.round((v2-v1)*100)/100,percentChange:v1?Math.round((v2-v1)/v1*100):null});
+  });
+  return {month1:{month:month1,total:Math.round(data1.total*100)/100},month2:{month:month2,total:Math.round(data2.total*100)/100},totalChange:Math.round((data2.total-data1.total)*100)/100,byCategory:comparison.sort(function(a,b){return Math.abs(b.change)-Math.abs(a.change);})};
+};
+
+// === ACCOUNT MANAGEMENT ===
+
+CopilotTools.getAccountSummary = function(accountName) {
+  var lookups = CopilotTools.buildLookups();
+  var acc = null;
+  for (var name in lookups.accounts) {
+    if (name.toLowerCase().indexOf(accountName.toLowerCase()) >= 0) { acc = lookups.accounts[name]; break; }
+  }
+  if (!acc) return {error:"Account not found: " + accountName};
+  var txs = CopilotTools.getCachedTransactions();
+  var accountTxs = txs.filter(function(tx) { return tx.accountId === acc.id; });
+  var income = 0, expenses = 0;
+  accountTxs.forEach(function(tx) {
+    if (tx.type === "INCOME") income += Math.abs(tx.amount);
+    else if (tx.type === "REGULAR") expenses += Math.abs(tx.amount);
+  });
+  return {account:acc.name,type:acc.type,subtype:acc.subtype,transactionCount:accountTxs.length,totalIncome:Math.round(income*100)/100,totalExpenses:Math.round(expenses*100)/100};
+};
+
+CopilotTools.listHiddenAccounts = function() {
+  var lookups = CopilotTools.buildLookups();
+  var hidden = [];
+  for (var name in lookups.accounts) {
+    if (lookups.accounts[name].isHidden) hidden.push(name);
+  }
+  return hidden;
+};
+
 // === EXPORT ===
 CopilotTools.exportToJSON = function() {
   return {version:CopilotTools.VERSION,exportedAt:new Date().toISOString(),transactions:CopilotTools.getCachedTransactions(),lookups:CopilotTools.buildLookups()};
@@ -643,32 +1057,42 @@ CopilotTools.status = function() {
 CopilotTools.help = function() {
   console.log("=== COPILOT TOOLS v" + CopilotTools.VERSION + " ===");
   console.log("");
-  console.log("IMPORT (v3.2.0):");
-  console.log("  parseCSV(csvString) - Parse CSV to array");
-  console.log("  analyzeCSVForDuplicates(csv) - Preview what would be created/skipped");
-  console.log("  importFromCSV(csv, {dryRun,onProgress}) - Import from Copilot CSV export");
-  console.log("  batchCreateTransactions(arr, {dryRun,stopOnDuplicate,onProgress})");
+  console.log("IMPORT:");
   console.log("  createTransaction({accountName,date,name,amount,categoryName,type,notes})");
+  console.log("  batchCreateTransactions(arr, {dryRun,stopOnDuplicate,onProgress})");
+  console.log("  parseCSV(csvString) / importFromCSV(csv, {dryRun})");
+  console.log("  analyzeCSVForDuplicates(csv) - Preview before import");
   console.log("");
-  console.log("DUPLICATES:");
-  console.log("  wouldBeDuplicate({date,name,amount,accountId}) - Check if exists");
-  console.log("  findDuplicatesInCache() - Find duplicates in cache");
-  console.log("");
-  console.log("UPDATE:");
+  console.log("TRANSACTIONS:");
   console.log("  updateTransaction(id, {categoryName,tagIds,notes,name})");
-  console.log("  bulkUpdateCategory(pattern, categoryName, {dryRun})");
-  console.log("  deleteTransaction(id)");
-  console.log("");
-  console.log("SEARCH:");
+  console.log("  deleteTransaction(id) / bulkUpdateCategory(pattern, category)");
   console.log("  searchTransactions(query, {startDate,endDate})");
-  console.log("  getCachedTransactions() - All transactions");
   console.log("");
-  console.log("LOOKUPS: showAccounts(), showCategories(), showTags()");
+  console.log("CATEGORIES:");
+  console.log("  createCategory(name, {parentCategory,colorName})");
+  console.log("  updateCategory(name, {name,colorName,parentCategory})");
+  console.log("  deleteCategory(name) / mergeCategories(sources[], target)");
+  console.log("  listCategoryHierarchy()");
+  console.log("");
+  console.log("BUDGETS:");
+  console.log("  getBudgets() / setBudget(category, amount)");
+  console.log("  getBudgetStatus(month) - Spending vs budget");
+  console.log("");
+  console.log("RECURRING:");
+  console.log("  createRecurring(txId, frequency) / updateRecurring(name, updates)");
+  console.log("  deleteRecurring(name) / getRecurringTransactions(name)");
+  console.log("  addTransactionToRecurring(txId, recurringName)");
+  console.log("");
+  console.log("ANALYTICS:");
+  console.log("  getSpendingTrend(category, months) / getMerchantAnalysis(limit)");
+  console.log("  findAnomalies({stdDevMultiple}) / compareMonths(m1, m2)");
+  console.log("");
+  console.log("TAGS: createTag({name,colorName}) / updateTag(name, updates) / deleteTag(name)");
+  console.log("ACCOUNTS: getAccountSummary(name) / listHiddenAccounts()");
+  console.log("LOOKUPS: showAccounts(), showCategories(), showTags(), showRecurrings()");
   console.log("EXPORT: exportToJSON(), downloadBackup()");
   console.log("");
-  console.log("CONFIG:");
-  console.log("  CopilotTools.config.dryRun = true  // Preview without making changes");
-  console.log("  CopilotTools.config.rateLimit = 300 // ms between API calls");
+  console.log("CONFIG: config.dryRun, config.rateLimit, config.maxRetries");
 };
 
 // === INIT ===

@@ -6,37 +6,49 @@ All notable changes to CopilotTools SDK will be documented in this file.
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
 
-### Added
+### Comprehensive SDK Release
 
-#### Transaction Creation
-- `createTransaction()` - Fully implemented with account/category resolution and duplicate detection
-- `batchCreateTransactions()` - Batch import with progress callbacks, dry-run support, stopOnDuplicate option
-- Account matching by name (partial) or mask
-- Category resolution with case-insensitive fallback
-- Tag resolution by name or ID
+Full-featured SDK combining import/export capabilities with complete management features.
+
+#### Transaction Management
+- `createTransaction()` - Full implementation with duplicate detection, account/category resolution
+- `batchCreateTransactions()` - Batch import with progress callbacks, dry-run support
+- `updateTransaction()` / `deleteTransaction()` - Transaction CRUD
+- `bulkUpdateCategory()` - Bulk category updates with pattern matching
 
 #### CSV Import
 - `parseCSV()` - Proper CSV parser with quoted field handling
-- `importFromCSV()` - Direct import from Copilot CSV export format
-- `analyzeCSVForDuplicates()` - Preview import: shows what would be created, duplicates, missing accounts/categories
+- `importFromCSV()` - Direct import from Copilot CSV export
+- `analyzeCSVForDuplicates()` - Preview what would be created/skipped
 
-#### Duplicate Detection
-- `wouldBeDuplicate()` - Check if transaction already exists (by date+name+amount+account)
-- `findDuplicatesInCache()` - Find existing duplicate transactions in cache
+#### Category Management
+- `createCategory()` / `updateCategory()` / `deleteCategory()` - Category CRUD
+- `listCategoryHierarchy()` - View parent/child structure
+- `mergeCategories()` - Consolidate multiple categories into one
+
+#### Budget Management
+- `getBudgets()` - All budgets organized by month
+- `setBudget()` - Set budget per category
+- `getBudgetStatus()` - Spending vs budget with percentages
+
+#### Recurring Management
+- `createRecurring()` / `updateRecurring()` / `deleteRecurring()` - Recurring CRUD
+- `getRecurringTransactions()` - List transactions linked to recurring
+- `addTransactionToRecurring()` - Link transactions to recurring rules
+
+#### Analytics
+- `getSpendingTrend()` - Spending over time by category
+- `getMerchantAnalysis()` - Top merchants by total spend
+- `findAnomalies()` - Detect unusual transaction amounts (statistical)
+- `compareMonths()` - Month-over-month comparison by category
+
+#### Account & Tag Management
+- `getAccountSummary()` / `listHiddenAccounts()`
+- `createTag()` / `updateTag()` / `deleteTag()`
 
 #### Configuration
 - `config.dryRun` - Global dry-run mode for all operations
-
-### Changed
-- Streamlined SDK focused on import/export workflows
-- Removed advanced management features (category/budget/recurring/analytics CRUD) - use Copilot UI for these
-
-### Removed (moved to v3.1.0 archive)
-- Category Management (createCategory, updateCategory, mergeCategories, listCategoryHierarchy)
-- Budget Management (getBudgets, setBudget, getBudgetStatus)
-- Recurring Management (createRecurring, updateRecurring, deleteRecurring, getRecurringTransactions)
-- Analytics (getSpendingTrend, getMerchantAnalysis, findAnomalies, compareMonths)
-- Account Management (getAccountSummary, listHiddenAccounts)
+- `config.maxRetries` / `config.retryDelay` - Network retry settings
 
 ---
 

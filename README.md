@@ -1,29 +1,45 @@
 # CopilotTools SDK v3.2.0
 
-A JavaScript SDK for programmatic import and management of Copilot.money transactions.
+A comprehensive JavaScript SDK for programmatic management of all Copilot.money features: transactions, categories, budgets, recurring rules, tags, and analytics.
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
 
 ## Features
 
-### Core Features
+### Transaction Management
+- Create, update, delete transactions with full validation
+- Batch import with progress callbacks and dry-run mode
+- CSV import from Copilot export format
+- Duplicate detection and analysis
 
-- **Transaction Creation**: Create transactions with full validation and duplicate detection
-- **Batch Import**: Import multiple transactions with progress callbacks
-- **CSV Import**: Parse and import Copilot CSV export format
-- **Duplicate Detection**: Automatic duplicate checking before creation
-- **Dry Run Mode**: Preview all operations before execution
-- **Tag Management**: Create and delete tags
+### Category Management
+- Create, update, delete categories
+- Parent/child hierarchy support
+- Merge multiple categories into one
+- View category hierarchy
 
-### New in v3.2.0
+### Budget Management
+- Get all budgets by month
+- Set budgets per category
+- Track spending vs budget status
 
-- **createTransaction()**: Fully implemented with account/category resolution and duplicate detection
-- **batchCreateTransactions()**: Batch import with progress callbacks, dry-run support
-- **parseCSV()**: Proper CSV parser with quoted field handling
-- **importFromCSV()**: Direct import from Copilot CSV export format
-- **analyzeCSVForDuplicates()**: Preview what would be created/skipped before import
-- **findDuplicatesInCache()**: Find existing duplicates in transaction cache
-- **config.dryRun**: Global dry-run mode for all operations
+### Recurring Management
+- Create recurring rules from transactions
+- Update frequency, name, category
+- Delete recurring rules
+- Link/unlink transactions
+
+### Analytics
+- Spending trends over time
+- Top merchant analysis
+- Anomaly detection (unusual amounts)
+- Month-over-month comparisons
+
+### Additional Features
+- Tag management (create, update, delete)
+- Account summaries and hidden accounts
+- JSON export and backup
+- Global dry-run mode
 
 ## Installation
 
@@ -182,11 +198,95 @@ CopilotTools.findDuplicatesInCache()
 // Create tag
 CopilotTools.createTag({name: 'Tax Deductible', colorName: 'GREEN1'})
 
+// Update tag
+CopilotTools.updateTag('Tax Deductible', {name: 'Tax 2026', colorName: 'BLUE1'})
+
 // Delete tag
 CopilotTools.deleteTag('Old Tag')
 ```
 
 **Available Colors:** RED1, RED2, ORANGE1, ORANGE2, YELLOW1, YELLOW2, GREEN1, GREEN2, TEAL1, TEAL2, BLUE1, BLUE2, PURPLE1, PURPLE2, PINK1, PINK2, GRAY1, GRAY2, OLIVE1, OLIVE2
+
+### Category Management
+
+```javascript
+// Create category with optional parent
+CopilotTools.createCategory('Coffee Shops', {parentCategory: 'Food & Drink', colorName: 'ORANGE1'})
+
+// Update category
+CopilotTools.updateCategory('Coffee Shops', {name: 'Cafes', colorName: 'TEAL1'})
+
+// Delete category
+CopilotTools.deleteCategory('Old Category')
+
+// View category hierarchy
+CopilotTools.listCategoryHierarchy()
+
+// Merge multiple categories into one
+CopilotTools.mergeCategories(['Coffee', 'Tea', 'Cafes'], 'Beverages', {dryRun: true})
+```
+
+### Budget Management
+
+```javascript
+// Get all budgets by month
+CopilotTools.getBudgets()
+
+// Set budget for a category
+CopilotTools.setBudget('Groceries', 500)
+
+// Get budget status with spending for current month
+CopilotTools.getBudgetStatus()  // or getBudgetStatus('2026-01')
+// Returns: [{category, budget, spent, remaining, percentUsed}]
+```
+
+### Recurring Management
+
+```javascript
+// Create recurring from a transaction
+CopilotTools.createRecurring('transactionId', 'MONTHLY')
+// Frequencies: WEEKLY, BIWEEKLY, MONTHLY, ANNUALLY
+
+// Update recurring rule
+CopilotTools.updateRecurring('Netflix', {name: 'Netflix Premium', frequency: 'MONTHLY'})
+
+// Delete recurring rule
+CopilotTools.deleteRecurring('Old Subscription')
+
+// Get all transactions linked to a recurring
+CopilotTools.getRecurringTransactions('Netflix')
+
+// Add transaction to existing recurring
+CopilotTools.addTransactionToRecurring('transactionId', 'recurringName')
+```
+
+### Analytics
+
+```javascript
+// Get spending trend over time
+CopilotTools.getSpendingTrend('Groceries', 6)  // Last 6 months
+CopilotTools.getSpendingTrend()  // All categories, 6 months
+
+// Analyze top merchants by spend
+CopilotTools.getMerchantAnalysis(20)  // Top 20 merchants
+
+// Find unusual transactions (anomaly detection)
+CopilotTools.findAnomalies({stdDevMultiple: 2})
+
+// Compare spending between two months
+CopilotTools.compareMonths('2025-12', '2026-01')
+```
+
+### Account Management
+
+```javascript
+// Get summary for an account
+CopilotTools.getAccountSummary('Checking')
+// Returns: {account, type, subtype, transactionCount, totalIncome, totalExpenses}
+
+// List hidden accounts
+CopilotTools.listHiddenAccounts()
+```
 
 ### Export
 

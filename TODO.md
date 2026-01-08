@@ -29,19 +29,23 @@
 
 ---
 
-## Archived in v3.1.0 (.versions/)
+## Completed in v3.2.0 (Comprehensive)
 
-The following features were implemented in v3.1.0 but removed in v3.2.0 to streamline the SDK for import workflows. Use Copilot UI for these operations:
+v3.2.0 includes ALL features - import/export plus full management capabilities.
 
-### Category/Budget/Recurring/Analytics
-- Category CRUD, hierarchy, merge
-- Budget get/set/status
-- Recurring CRUD
-- Spending trends, merchant analysis, anomaly detection
+### All Features Complete
+- [x] Transaction CRUD with duplicate detection
+- [x] Batch import with CSV support
+- [x] Category management (CRUD, hierarchy, merge)
+- [x] Budget management (get/set/status)
+- [x] Recurring management (CRUD, link transactions)
+- [x] Analytics (trends, merchants, anomalies, comparisons)
+- [x] Account and tag management
+- [x] Global dry-run mode
 
 ---
 
-## Completed in v3.1.0
+## Previous: Completed in v3.1.0
 
 ### Category Management
 - [x] `createCategory(name, {parentCategory, colorName})` - Create new categories
