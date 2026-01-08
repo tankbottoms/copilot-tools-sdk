@@ -1,6 +1,6 @@
-# CopilotTools SDK v3.1.0
+# CopilotTools SDK v3.2.0
 
-A comprehensive JavaScript SDK for programmatic management of Copilot.money transactions, categories, tags, budgets, and recurring transactions.
+A JavaScript SDK for programmatic import and management of Copilot.money transactions.
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
 
@@ -8,21 +8,22 @@ A comprehensive JavaScript SDK for programmatic management of Copilot.money tran
 
 ### Core Features
 
-- **Transaction Management**: Update, delete, and search transactions with filters
-- **Bulk Operations**: Update categories with progress callbacks and dry-run mode
-- **Tag Management**: Create, update, and delete tags
-- **Auto-Categorization**: Rule-based categorization with customizable patterns
-- **Import/Export**: CSV export and JSON backup/restore
-- **Duplicate Detection**: Prevent duplicate transaction creation
+- **Transaction Creation**: Create transactions with full validation and duplicate detection
+- **Batch Import**: Import multiple transactions with progress callbacks
+- **CSV Import**: Parse and import Copilot CSV export format
+- **Duplicate Detection**: Automatic duplicate checking before creation
+- **Dry Run Mode**: Preview all operations before execution
+- **Tag Management**: Create and delete tags
 
-### New in v3.1.0
+### New in v3.2.0
 
-- **Category Management**: Create, update, delete, merge categories with hierarchy support
-- **Budget Management**: Get/set budgets, track spending vs budget by category
-- **Recurring Transactions**: Full CRUD - create, update, delete recurring rules
-- **Analytics**: Spending trends, merchant analysis, anomaly detection, month comparisons
-- **Account Management**: Account summaries, list hidden accounts
-- **Technical**: Retry logic for network errors, progress callbacks
+- **createTransaction()**: Fully implemented with account/category resolution and duplicate detection
+- **batchCreateTransactions()**: Batch import with progress callbacks, dry-run support
+- **parseCSV()**: Proper CSV parser with quoted field handling
+- **importFromCSV()**: Direct import from Copilot CSV export format
+- **analyzeCSVForDuplicates()**: Preview what would be created/skipped before import
+- **findDuplicatesInCache()**: Find existing duplicates in transaction cache
+- **config.dryRun**: Global dry-run mode for all operations
 
 ## Installation
 
@@ -32,7 +33,7 @@ A comprehensive JavaScript SDK for programmatic management of Copilot.money tran
 2. Open the browser console:
    - **Mac**: `Cmd + Option + J`
    - **Windows/Linux**: `Ctrl + Shift + J`
-3. Copy the entire contents of `CopilotToolsSDK-v3.1.0.js`
+3. Copy the entire contents of `CopilotToolsSDK-v3.2.0.js`
 4. Paste into the console and press Enter
 5. Verify installation: `CopilotTools.status()`
 
@@ -107,14 +108,6 @@ CopilotTools.searchTransactions('Amazon', {
 })
 ```
 
-#### findTransactionsByPattern(pattern, options)
-Fuzzy search using word matching.
-
-```javascript
-// Matches 'Zelle Payment To Doctor Smith'
-CopilotTools.findTransactionsByPattern('Zelle Doctor')
-```
-
 ### Bulk Operations
 
 #### bulkUpdateCategory(pattern, newCategoryName, options)
@@ -122,17 +115,65 @@ Update category for all transactions matching a pattern.
 
 ```javascript
 // Preview changes first
-CopilotTools.bulkUpdateCategory('Zelle Payment Doctor', 'Healthcare', {dryRun: true})
+CopilotTools.bulkUpdateCategory('Zelle Payment', 'Healthcare', {dryRun: true})
 
 // Execute
-CopilotTools.bulkUpdateCategory('Zelle Payment Doctor', 'Healthcare')
+CopilotTools.bulkUpdateCategory('Zelle Payment', 'Healthcare')
 ```
 
-#### bulkAddTag(pattern, tagName, options)
-Add a tag to all transactions matching a pattern.
+### Batch Create (v3.2.0)
 
 ```javascript
-CopilotTools.bulkAddTag('Amazon', 'Online Shopping', {dryRun: true})
+var transactions = [
+  {accountName: 'Checking', date: '2026-01-01', name: 'Store A', amount: 50, categoryName: 'Shopping'},
+  {accountName: 'Checking', date: '2026-01-02', name: 'Store B', amount: 30, categoryName: 'Shopping'}
+];
+
+// Preview first (recommended)
+CopilotTools.batchCreateTransactions(transactions, {dryRun: true})
+
+// Execute with options
+CopilotTools.batchCreateTransactions(transactions, {
+  dryRun: false,
+  stopOnDuplicate: false,  // Continue even if duplicates found
+  delayMs: 300,            // Rate limiting between API calls
+  onProgress: function(p) { console.log(p.current + '/' + p.total); }
+})
+```
+
+### CSV Import (v3.2.0)
+
+Supports Copilot's CSV export format:
+`date,name,amount,status,category,parent category,excluded,tags,type,account,account mask,note,recurring`
+
+```javascript
+// Parse CSV string to array
+var rows = CopilotTools.parseCSV(csvString)
+
+// Analyze before import (see what would be created/skipped)
+var analysis = CopilotTools.analyzeCSVForDuplicates(csvString)
+// Returns: {total, wouldCreate[], duplicates[], missingAccounts[], missingCategories[], zeroAmount[]}
+
+// Import from CSV
+CopilotTools.importFromCSV(csvString, {dryRun: true})  // Preview
+CopilotTools.importFromCSV(csvString, {dryRun: false}) // Execute
+```
+
+### Duplicate Detection (v3.2.0)
+
+```javascript
+// Check if a transaction would be duplicate
+CopilotTools.wouldBeDuplicate({
+  date: '2026-01-08',
+  name: 'Costco',
+  amount: 100,
+  accountId: 'account-id'
+})
+// Returns: {isDuplicate: true/false, existingTransaction: {...}}
+
+// Find duplicates already in cache
+CopilotTools.findDuplicatesInCache()
+// Returns array of {original, duplicate} pairs
 ```
 
 ### Tag Management
@@ -141,121 +182,13 @@ CopilotTools.bulkAddTag('Amazon', 'Online Shopping', {dryRun: true})
 // Create tag
 CopilotTools.createTag({name: 'Tax Deductible', colorName: 'GREEN1'})
 
-// Update tag
-CopilotTools.updateTag('Tax Deductible', {name: 'Tax 2026', colorName: 'BLUE1'})
-
 // Delete tag
 CopilotTools.deleteTag('Old Tag')
 ```
 
 **Available Colors:** RED1, RED2, ORANGE1, ORANGE2, YELLOW1, YELLOW2, GREEN1, GREEN2, TEAL1, TEAL2, BLUE1, BLUE2, PURPLE1, PURPLE2, PINK1, PINK2, GRAY1, GRAY2, OLIVE1, OLIVE2
 
-### Recurring Transactions (v3.1.0)
-
-```javascript
-// Create recurring from a transaction
-CopilotTools.createRecurring('transactionId', 'MONTHLY')
-// Frequencies: WEEKLY, BIWEEKLY, MONTHLY, ANNUALLY
-
-// Update recurring rule
-CopilotTools.updateRecurring('Netflix', {name: 'Netflix Premium', frequency: 'MONTHLY'})
-
-// Delete recurring rule
-CopilotTools.deleteRecurring('Old Subscription')
-
-// Get all transactions linked to a recurring
-CopilotTools.getRecurringTransactions('Netflix')
-
-// Add transaction to existing recurring
-CopilotTools.addTransactionToRecurring('transactionId', 'recurringName')
-```
-
-### Category Management (v3.1.0)
-
-```javascript
-// Create new category
-CopilotTools.createCategory('Coffee Shops', {parentCategory: 'Food & Drink', colorName: 'ORANGE1'})
-
-// Update category
-CopilotTools.updateCategory('Coffee Shops', {name: 'Cafes', colorName: 'TEAL1'})
-
-// Delete category
-CopilotTools.deleteCategory('Old Category')
-
-// View category hierarchy
-CopilotTools.listCategoryHierarchy()
-
-// Merge multiple categories into one
-CopilotTools.mergeCategories(['Coffee', 'Tea', 'Cafes'], 'Beverages', {dryRun: true})
-
-// Find uncategorized transactions
-CopilotTools.findUncategorized()
-```
-
-### Budget Management (v3.1.0)
-
-```javascript
-// Get all budgets by month
-CopilotTools.getBudgets()
-
-// Set budget for a category
-CopilotTools.setBudget('Groceries', 500)
-
-// Get budget status with spending for current month
-CopilotTools.getBudgetStatus()  // or getBudgetStatus('2026-01')
-// Returns: [{category, budget, spent, remaining, percentUsed}]
-```
-
-### Analytics (v3.1.0)
-
-```javascript
-// Get spending trend over time
-CopilotTools.getSpendingTrend('Groceries', 6)  // Last 6 months
-CopilotTools.getSpendingTrend()  // All categories, 6 months
-
-// Analyze top merchants by spend
-CopilotTools.getMerchantAnalysis(20)  // Top 20 merchants
-
-// Find unusual transactions (anomaly detection)
-CopilotTools.findAnomalies({stdDevMultiple: 2})
-
-// Compare spending between two months
-CopilotTools.compareMonths('2025-12', '2026-01')
-```
-
-### Account Management (v3.1.0)
-
-```javascript
-// Get summary for an account
-CopilotTools.getAccountSummary('Checking')
-// Returns: {account, type, subtype, transactionCount, totalIncome, totalExpenses}
-
-// List hidden accounts
-CopilotTools.listHiddenAccounts()
-```
-
-### Auto-Categorization
-
-```javascript
-// Get category suggestion for a transaction name
-CopilotTools.suggestCategory('Netflix Subscription')
-// Returns: {category: 'Subscriptions', confidence: 1.0, matchedRule: {...}}
-
-// Review uncategorized with suggestions
-CopilotTools.reviewUncategorized()
-
-// Add custom rule
-CopilotTools.addAutoCategorizeRule('starbucks', 'Food & Drink', {priority: 10})
-
-// Apply rules to uncategorized (preview first)
-CopilotTools.applyRulesToUncategorized({dryRun: true})
-CopilotTools.applyRulesToUncategorized({dryRun: false, minConfidence: 0.5})
-
-// List all rules
-CopilotTools.listRules()
-```
-
-### Import/Export
+### Export
 
 ```javascript
 // Export all data to JSON
@@ -263,69 +196,6 @@ var backup = CopilotTools.exportToJSON()
 
 // Download backup file
 CopilotTools.downloadBackup()  // Downloads copilot-backup-YYYY-MM-DD.json
-
-// Import from CSV (preview first)
-CopilotTools.importFromCSV(csvString, {
-  dryRun: true,
-  categoryMapping: {'Old Category': 'New Category'},
-  accountMapping: {'Old Account': 'New Account'}
-})
-```
-
-### Duplicate Detection
-
-```javascript
-// Check if transaction would be duplicate
-CopilotTools.wouldBeDuplicate({
-  date: '2026-01-08',
-  name: 'Costco',
-  amount: 100,
-  accountId: 'account-id'
-})
-
-// Analyze array before import
-var analysis = CopilotTools.analyzeForDuplicates(transactionArray)
-CopilotTools.printDuplicateAnalysis(analysis)
-```
-
-### Amazon Transaction Matching
-
-```javascript
-// Find Amazon transactions
-CopilotTools.findAmazonTransactions()
-
-// Match Amazon orders to transactions
-var orders = [{date: '2026-01-05', amount: 25.99, orderId: '123-456', itemDescription: 'Book'}]
-CopilotTools.matchAmazonOrders(orders)
-```
-
-### Batch Create
-
-```javascript
-var transactions = [
-  {accountName: 'Checking', date: '2026-01-01', name: 'Store A', amount: 50, categoryName: 'Shopping'},
-  {accountName: 'Checking', date: '2026-01-02', name: 'Store B', amount: 30, categoryName: 'Shopping'}
-];
-
-// Preview first
-CopilotTools.batchCreateTransactions(transactions, {dryRun: true})
-
-// Execute with options
-CopilotTools.batchCreateTransactions(transactions, {
-  dryRun: false,
-  stopOnDuplicate: false,  // Continue even if duplicates found
-  delayMs: 300             // Rate limiting between API calls
-})
-```
-
-### Testing Utilities
-
-```javascript
-// Find test transactions (containing 'TEST' in name)
-CopilotTools.findTestTransactions()
-
-// Delete all test transactions
-CopilotTools.deleteTestTransactions()
 ```
 
 ## Constants
@@ -339,13 +209,16 @@ CopilotTools.FREQUENCIES     // WEEKLY, BIWEEKLY, MONTHLY, ANNUALLY
 ## Configuration
 
 ```javascript
+// Enable dry-run mode globally (v3.2.0)
+CopilotTools.config.dryRun = true     // Preview all operations without making changes
+
 // Adjust rate limiting (default 300ms between API calls)
 CopilotTools.config.rateLimit = 500
 
 // Disable verbose logging
 CopilotTools.config.verbose = false
 
-// Retry settings for network errors (v3.1.0)
+// Retry settings for network errors
 CopilotTools.config.maxRetries = 3    // Number of retries on network error
 CopilotTools.config.retryDelay = 1000 // Delay between retries (ms)
 ```

@@ -1,8 +1,43 @@
 # CopilotTools SDK - Development Roadmap
 
-## Current Version: 3.1.0
+## Current Version: 3.2.0
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
+
+---
+
+## Completed in v3.2.0
+
+### Transaction Creation
+- [x] `createTransaction()` - Full implementation with duplicate detection
+- [x] `batchCreateTransactions()` - Batch import with progress callbacks
+- [x] Account matching by name (partial) or mask
+- [x] Category resolution with case-insensitive fallback
+- [x] Tag resolution by name or ID
+
+### CSV Import
+- [x] `parseCSV()` - Proper CSV parser with quoted field handling
+- [x] `importFromCSV()` - Direct import from Copilot CSV export
+- [x] `analyzeCSVForDuplicates()` - Preview before import
+
+### Duplicate Detection
+- [x] `wouldBeDuplicate()` - Check for existing transactions
+- [x] `findDuplicatesInCache()` - Find duplicates in cache
+
+### Configuration
+- [x] `config.dryRun` - Global dry-run mode
+
+---
+
+## Archived in v3.1.0 (.versions/)
+
+The following features were implemented in v3.1.0 but removed in v3.2.0 to streamline the SDK for import workflows. Use Copilot UI for these operations:
+
+### Category/Budget/Recurring/Analytics
+- Category CRUD, hierarchy, merge
+- Budget get/set/status
+- Recurring CRUD
+- Spending trends, merchant analysis, anomaly detection
 
 ---
 

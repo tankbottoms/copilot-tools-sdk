@@ -2,6 +2,44 @@
 
 All notable changes to CopilotTools SDK will be documented in this file.
 
+## [3.2.0] - 2026-01-08
+
+**Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
+
+### Added
+
+#### Transaction Creation
+- `createTransaction()` - Fully implemented with account/category resolution and duplicate detection
+- `batchCreateTransactions()` - Batch import with progress callbacks, dry-run support, stopOnDuplicate option
+- Account matching by name (partial) or mask
+- Category resolution with case-insensitive fallback
+- Tag resolution by name or ID
+
+#### CSV Import
+- `parseCSV()` - Proper CSV parser with quoted field handling
+- `importFromCSV()` - Direct import from Copilot CSV export format
+- `analyzeCSVForDuplicates()` - Preview import: shows what would be created, duplicates, missing accounts/categories
+
+#### Duplicate Detection
+- `wouldBeDuplicate()` - Check if transaction already exists (by date+name+amount+account)
+- `findDuplicatesInCache()` - Find existing duplicate transactions in cache
+
+#### Configuration
+- `config.dryRun` - Global dry-run mode for all operations
+
+### Changed
+- Streamlined SDK focused on import/export workflows
+- Removed advanced management features (category/budget/recurring/analytics CRUD) - use Copilot UI for these
+
+### Removed (moved to v3.1.0 archive)
+- Category Management (createCategory, updateCategory, mergeCategories, listCategoryHierarchy)
+- Budget Management (getBudgets, setBudget, getBudgetStatus)
+- Recurring Management (createRecurring, updateRecurring, deleteRecurring, getRecurringTransactions)
+- Analytics (getSpendingTrend, getMerchantAnalysis, findAnomalies, compareMonths)
+- Account Management (getAccountSummary, listHiddenAccounts)
+
+---
+
 ## [3.1.0] - 2026-01-08
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
