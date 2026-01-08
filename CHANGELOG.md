@@ -2,6 +2,49 @@
 
 All notable changes to CopilotTools SDK will be documented in this file.
 
+## [3.3.0] - 2026-01-08
+
+**Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
+
+### New Features
+
+- `groupAsVacation(name, startDate, endDate, options)` - Tag and add notes to vacation/trip expenses
+- `bulkAddTag(transactionIds, tagName, options)` - Add tag to multiple transactions
+- `getTransactionsByDateRange(startDate, endDate, options)` - Query transactions by date
+
+### Technical Improvements
+
+- Converted function declarations to expressions for strict mode compatibility
+- Fixed double-escaped regex patterns in GraphQL parser
+- Removed duplicate code blocks
+- Fixed CSV parsing newline handling
+
+---
+
+## [3.2.1] - 2026-01-08
+
+**Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
+
+### Enhancement
+
+Direct accountId/itemId support for improved performance:
+
+- `createTransaction()` now accepts `accountId` and `itemId` directly (bypasses name lookup)
+- `batchCreateTransactions()` accepts `accountId` as alternative to `accountName`
+- Both functions remain backwards-compatible with name-based lookups
+
+**Usage:**
+
+```javascript
+// Option 1: Use account name (SDK resolves to ID)
+createTransaction({accountName: 'Goldman Sachs...', ...})
+
+// Option 2: Use pre-resolved IDs directly (faster)
+createTransaction({accountId: 'abc123', itemId: 'xyz789', ...})
+```
+
+---
+
 ## [3.2.0] - 2026-01-08
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)

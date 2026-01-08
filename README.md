@@ -1,8 +1,15 @@
-# CopilotTools SDK v3.2.0
+# CopilotTools SDK v3.3.0
 
 A comprehensive JavaScript SDK for programmatic management of all Copilot.money features: transactions, categories, budgets, recurring rules, tags, and analytics.
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
+
+## What's New in v3.3.0
+
+- **Vacation/trip grouping**: `groupAsVacation()` for tagging and noting trip expenses
+- **Bulk tag operations**: `bulkAddTag()` for mass tag updates
+- **Date range queries**: `getTransactionsByDateRange()` for filtered lookups
+- **Improved strict mode compatibility**: All function declarations converted to expressions
 
 ## Features
 
@@ -49,7 +56,7 @@ A comprehensive JavaScript SDK for programmatic management of all Copilot.money 
 2. Open the browser console:
    - **Mac**: `Cmd + Option + J`
    - **Windows/Linux**: `Ctrl + Shift + J`
-3. Copy the entire contents of `CopilotToolsSDK-v3.2.0.js`
+3. Copy the entire contents of `CopilotToolsSDK-v3.3.0.js`
 4. Paste into the console and press Enter
 5. Verify installation: `CopilotTools.status()`
 

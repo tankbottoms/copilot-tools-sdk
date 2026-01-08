@@ -1,8 +1,31 @@
 # CopilotTools SDK - Development Roadmap
 
-## Current Version: 3.2.0
+## Current Version: 3.3.0
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
+
+---
+
+## Completed in v3.3.0
+
+### New Features
+- [x] `groupAsVacation()` - Tag and note vacation/trip expenses
+- [x] `bulkAddTag()` - Add tag to multiple transactions
+- [x] `getTransactionsByDateRange()` - Query transactions by date range
+
+### Technical Fixes
+- [x] Strict mode compatibility (function expressions)
+- [x] Fixed double-escaped regex in GraphQL parser
+- [x] Fixed CSV newline handling
+- [x] Removed duplicate code blocks
+
+---
+
+## Completed in v3.2.1
+
+### Performance Enhancement
+- [x] `createTransaction()` accepts `accountId`/`itemId` directly (bypasses name lookup)
+- [x] `batchCreateTransactions()` accepts `accountId` as alternative to `accountName`
 
 ---
 
