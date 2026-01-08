@@ -1,51 +1,56 @@
 # CopilotTools SDK - Development Roadmap
 
-## Current Version: 3.0.1
+## Current Version: 3.1.0
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
 
 ---
 
-## High Priority Features
+## Completed in v3.1.0
 
 ### Category Management
-- [ ] `createCategory(name, parentCategory, icon, color)` - Create new categories
-- [ ] `updateCategory(name, updates)` - Rename, change parent, update icon/color
-- [ ] `mergeCategories(sourceNames[], targetName)` - Consolidate categories
-- [ ] `listCategoryHierarchy()` - Display parent/child relationships
+- [x] `createCategory(name, {parentCategory, colorName})` - Create new categories
+- [x] `updateCategory(name, updates)` - Rename, change parent, update color
+- [x] `mergeCategories(sourceNames[], targetName, {dryRun})` - Consolidate categories
+- [x] `listCategoryHierarchy()` - Display parent/child relationships
 
 ### Budget Management
-- [ ] `getBudgets()` - Retrieve budget settings per category
-- [ ] `setBudget(categoryName, amount)` - Set monthly budget
-- [ ] `getBudgetStatus()` - Current spend vs budget by category
+- [x] `getBudgets()` - Retrieve budget settings per category
+- [x] `setBudget(categoryName, amount)` - Set monthly budget
+- [x] `getBudgetStatus(month)` - Current spend vs budget by category
 
 ### Recurring Enhancements
-- [ ] `updateRecurring(id, updates)` - Modify frequency, name
-- [ ] `deleteRecurring(id)` - Remove recurring rule
-- [ ] `removeTransactionFromRecurring(txId)` - Unlink transaction
-- [ ] `getRecurringTransactions(recurringId)` - List all linked transactions
+- [x] `updateRecurring(name, updates)` - Modify frequency, name, category
+- [x] `deleteRecurring(name)` - Remove recurring rule
+- [x] `getRecurringTransactions(name)` - List all linked transactions
+
+### Analytics
+- [x] `getSpendingTrend(categoryName, months)` - Spending over time
+- [x] `getMerchantAnalysis(limit)` - Top merchants by spend
+- [x] `findAnomalies({stdDevMultiple})` - Unusual amounts detection
+- [x] `compareMonths(month1, month2)` - Period comparison
+
+### Account Management
+- [x] `getAccountSummary(accountName)` - Transaction count, totals
+- [x] `listHiddenAccounts()` - Show hidden accounts
+
+### Technical Improvements
+- [x] Retry logic for network errors (`_withRetry`)
+- [x] Progress callbacks during batch operations (`onProgress`)
+- [x] `maxRetries` and `retryDelay` config options
+
+---
+
+## High Priority Features
 
 ### Import Enhancements
 - [ ] Better CSV parsing with quoted field support
 - [ ] Support for different date formats
 - [ ] Bank-specific CSV format detection
 - [ ] Resume capability for interrupted imports
-- [ ] Progress callbacks during batch operations
 
----
-
-## Medium Priority Features
-
-### Analytics
-- [ ] `getSpendingTrend(categoryName, months)` - Spending over time
-- [ ] `getMerchantAnalysis()` - Top merchants by spend
-- [ ] `findAnomalies()` - Unusual amounts, duplicates
-- [ ] `compareMonths(month1, month2)` - Period comparison
-
-### Account Management
-- [ ] `updateAccount(name, updates)` - Rename, hide/show
-- [ ] `getAccountSummary(accountName)` - Balance, transaction count
-- [ ] `listHiddenAccounts()` - Show hidden accounts
+### Recurring Enhancements
+- [ ] `removeTransactionFromRecurring(txId)` - Unlink transaction
 
 ### Auto-Categorization
 - [ ] Machine learning based suggestions
@@ -100,8 +105,8 @@
 
 - [ ] Add TypeScript definitions
 - [ ] Unit test coverage
-- [ ] Error handling improvements
-- [ ] Retry logic for failed API calls
+- [x] Error handling improvements (v3.1.0)
+- [x] Retry logic for failed API calls (v3.1.0)
 - [ ] Cache invalidation handling
 - [ ] Documentation generator
 - [ ] Minified production build
@@ -111,8 +116,8 @@
 ## Known Issues
 
 - Cache may not update after external changes (refresh page)
-- Large batch operations may hit rate limits
-- Some mutation field names differ from expected (documented in v3.0.1)
+- Large batch operations may hit rate limits (adjust `config.rateLimit`)
+- `createTransaction` not implemented (use Copilot UI for manual entry)
 
 ---
 

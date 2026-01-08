@@ -1,19 +1,28 @@
-# CopilotTools SDK v3.0.1
+# CopilotTools SDK v3.1.0
 
-A comprehensive JavaScript SDK for programmatic management of Copilot.money transactions, categories, tags, and recurring transactions.
+A comprehensive JavaScript SDK for programmatic management of Copilot.money transactions, categories, tags, budgets, and recurring transactions.
 
 **Tested with:** [app.copilot.money](https://app.copilot.money) v26.1.8-beta.1214 (Build: 630)
 
 ## Features
 
-- **Transaction Management**: Create, update, delete, and search transactions
-- **Bulk Operations**: Update categories or add tags to multiple transactions at once
+### Core Features
+
+- **Transaction Management**: Update, delete, and search transactions with filters
+- **Bulk Operations**: Update categories with progress callbacks and dry-run mode
 - **Tag Management**: Create, update, and delete tags
-- **Recurring Transactions**: Create recurring rules and link transactions
 - **Auto-Categorization**: Rule-based categorization with customizable patterns
-- **Import/Export**: CSV import and JSON backup/restore
+- **Import/Export**: CSV export and JSON backup/restore
 - **Duplicate Detection**: Prevent duplicate transaction creation
-- **Amazon Matching**: Match Amazon orders to bank transactions
+
+### New in v3.1.0
+
+- **Category Management**: Create, update, delete, merge categories with hierarchy support
+- **Budget Management**: Get/set budgets, track spending vs budget by category
+- **Recurring Transactions**: Full CRUD - create, update, delete recurring rules
+- **Analytics**: Spending trends, merchant analysis, anomaly detection, month comparisons
+- **Account Management**: Account summaries, list hidden accounts
+- **Technical**: Retry logic for network errors, progress callbacks
 
 ## Installation
 
@@ -23,7 +32,7 @@ A comprehensive JavaScript SDK for programmatic management of Copilot.money tran
 2. Open the browser console:
    - **Mac**: `Cmd + Option + J`
    - **Windows/Linux**: `Ctrl + Shift + J`
-3. Copy the entire contents of `CopilotToolsSDK-v3.0.1.js`
+3. Copy the entire contents of `CopilotToolsSDK-v3.1.0.js`
 4. Paste into the console and press Enter
 5. Verify installation: `CopilotTools.status()`
 
@@ -139,33 +148,90 @@ CopilotTools.updateTag('Tax Deductible', {name: 'Tax 2026', colorName: 'BLUE1'})
 CopilotTools.deleteTag('Old Tag')
 ```
 
-**Available Colors:** RED1, RED2, ORANGE1, ORANGE2, YELLOW1, YELLOW2, GREEN1, GREEN2, TEAL1, TEAL2, BLUE1, BLUE2, PURPLE1, PURPLE2, PINK1, PINK2, GRAY1, GRAY2
+**Available Colors:** RED1, RED2, ORANGE1, ORANGE2, YELLOW1, YELLOW2, GREEN1, GREEN2, TEAL1, TEAL2, BLUE1, BLUE2, PURPLE1, PURPLE2, PINK1, PINK2, GRAY1, GRAY2, OLIVE1, OLIVE2
 
-### Recurring Transactions
+### Recurring Transactions (v3.1.0)
 
 ```javascript
 // Create recurring from a transaction
 CopilotTools.createRecurring('transactionId', 'MONTHLY')
-// Frequencies: WEEKLY, BIWEEKLY, MONTHLY, YEARLY
+// Frequencies: WEEKLY, BIWEEKLY, MONTHLY, ANNUALLY
+
+// Update recurring rule
+CopilotTools.updateRecurring('Netflix', {name: 'Netflix Premium', frequency: 'MONTHLY'})
+
+// Delete recurring rule
+CopilotTools.deleteRecurring('Old Subscription')
+
+// Get all transactions linked to a recurring
+CopilotTools.getRecurringTransactions('Netflix')
 
 // Add transaction to existing recurring
 CopilotTools.addTransactionToRecurring('transactionId', 'recurringName')
 ```
 
-### Category Management
+### Category Management (v3.1.0)
 
 ```javascript
-// Find transactions by category
-CopilotTools.findByCategory('Groceries')
+// Create new category
+CopilotTools.createCategory('Coffee Shops', {parentCategory: 'Food & Drink', colorName: 'ORANGE1'})
+
+// Update category
+CopilotTools.updateCategory('Coffee Shops', {name: 'Cafes', colorName: 'TEAL1'})
+
+// Delete category
+CopilotTools.deleteCategory('Old Category')
+
+// View category hierarchy
+CopilotTools.listCategoryHierarchy()
+
+// Merge multiple categories into one
+CopilotTools.mergeCategories(['Coffee', 'Tea', 'Cafes'], 'Beverages', {dryRun: true})
 
 // Find uncategorized transactions
 CopilotTools.findUncategorized()
+```
 
-// Get spending breakdown by category
-CopilotTools.getCategoryBreakdown()
+### Budget Management (v3.1.0)
 
-// Delete a category (transactions must be reassigned first)
-CopilotTools.deleteCategory('Old Category')
+```javascript
+// Get all budgets by month
+CopilotTools.getBudgets()
+
+// Set budget for a category
+CopilotTools.setBudget('Groceries', 500)
+
+// Get budget status with spending for current month
+CopilotTools.getBudgetStatus()  // or getBudgetStatus('2026-01')
+// Returns: [{category, budget, spent, remaining, percentUsed}]
+```
+
+### Analytics (v3.1.0)
+
+```javascript
+// Get spending trend over time
+CopilotTools.getSpendingTrend('Groceries', 6)  // Last 6 months
+CopilotTools.getSpendingTrend()  // All categories, 6 months
+
+// Analyze top merchants by spend
+CopilotTools.getMerchantAnalysis(20)  // Top 20 merchants
+
+// Find unusual transactions (anomaly detection)
+CopilotTools.findAnomalies({stdDevMultiple: 2})
+
+// Compare spending between two months
+CopilotTools.compareMonths('2025-12', '2026-01')
+```
+
+### Account Management (v3.1.0)
+
+```javascript
+// Get summary for an account
+CopilotTools.getAccountSummary('Checking')
+// Returns: {account, type, subtype, transactionCount, totalIncome, totalExpenses}
+
+// List hidden accounts
+CopilotTools.listHiddenAccounts()
 ```
 
 ### Auto-Categorization
@@ -265,9 +331,9 @@ CopilotTools.deleteTestTransactions()
 ## Constants
 
 ```javascript
-CopilotTools.COLORS          // Available tag/category colors
+CopilotTools.COLORS          // Available tag/category colors (includes OLIVE1, OLIVE2)
 CopilotTools.TRANSACTION_TYPES  // REGULAR, INCOME, INTERNAL_TRANSFER
-CopilotTools.FREQUENCIES     // WEEKLY, BIWEEKLY, MONTHLY, YEARLY
+CopilotTools.FREQUENCIES     // WEEKLY, BIWEEKLY, MONTHLY, ANNUALLY
 ```
 
 ## Configuration
@@ -278,6 +344,10 @@ CopilotTools.config.rateLimit = 500
 
 // Disable verbose logging
 CopilotTools.config.verbose = false
+
+// Retry settings for network errors (v3.1.0)
+CopilotTools.config.maxRetries = 3    // Number of retries on network error
+CopilotTools.config.retryDelay = 1000 // Delay between retries (ms)
 ```
 
 ## Troubleshooting
